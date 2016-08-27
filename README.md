@@ -1,12 +1,12 @@
-Title: RGB Simple Communication
-Author: Brian Khuu
-Website: briankhuu.com
-Date: 28th August 2016
-Description:
-  The concept is to transmit data via LED in the simplest method possible.
-  The targets situation is a smartphone pointed at an LED.
+* Title: RGB Simple Communication
+* Author: Brian Khuu
+* Website: briankhuu.com
+* Date: 28th August 2016
+* Description:
+  - The concept is to transmit data via LED in the simplest method possible.
+  - The targets situation is a smartphone pointed at an LED.
 
-  The self imposed challenge is:
+  - The self imposed challenge is:
     * No external clocking : The issue with having an led dedicated to the
       clock signal is that the state transition between data bits is at least
       twice. It would be better to embed the clocking in the data.
@@ -27,7 +27,7 @@ Description:
     * If the red green and blue leds are off, then the communication
       channel is down.
 
-  What was acheived is a working algorithm for transmission of variable
+  - What was acheived is a working algorithm for transmission of variable
   length bytes. In this implementation if the output colour is dark, then
   the channel is closed. The channel is online if at least one led is active.
   Every 2bits is represented as a transition between two data colour state.
@@ -36,14 +36,14 @@ Description:
   (But in the example, it is useds as a character mark and optionally as a
   parity bit)
 
-Optional Objectives:
-  * Would be good to implement a bit of parity checking
-  * Package this as a libary for ready use in anything.
-  * Write an android program that can visually decode such signals.
-  * Or maybe a hardware with colour sensor that can decode such signals.
+* Optional Objectives:
+  - Would be good to implement a bit of parity checking
+  - Package this as a libary for ready use in anything.
+  - Write an android program that can visually decode such signals.
+  - Or maybe a hardware with colour sensor that can decode such signals.
 
 Application:
-  Honestly there is not too much use for something like this, considering
+  - Honestly there is not too much use for something like this, considering
   that there are already bluetooth.
   - As a slower alternative to UART... really?
   - Debug output? You might not have a UART engine in your mcu, but may have
@@ -52,7 +52,7 @@ Application:
 
 This is this table showing the LED colours and the meaning assigned to each state in this algo
 
-```
+
   | COLOUR   | R | G | B | Description                                                                |
   |----------|---|---|---|----------------------------------------------------------------------------|
   | DARK     | 0 | 0 | 0 | - Channel Off                                                              |
@@ -63,4 +63,3 @@ This is this table showing the LED colours and the meaning assigned to each stat
   | MAGENTA  | 1 | 0 | 1 | 2bit Data Colour State 4                                                   |
   | YELLOW   | 1 | 1 | 0 | - Mark 2 (Mark stderr ?) (Mark&Parity Bit 0 ?) (bitmap mode: vsync ?)      |
   | WHITE    | 1 | 1 | 1 | - Mark 1 (Mark stdout ?) (Mark&Parity Bit 1 ?) (bitmap mode: hsync ?)      |
-```
