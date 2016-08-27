@@ -2,7 +2,8 @@
 * Author: Brian Khuu
 * Website: briankhuu.com
 * Date: 28th August 2016
-* Description:
+
+## Description:
   - The concept is to transmit data via LED in the simplest method possible.
   - The targets situation is a smartphone pointed at an LED.
 
@@ -36,19 +37,21 @@
   (But in the example, it is useds as a character mark and optionally as a
   parity bit)
 
-* Optional Objectives:
+##  Optional Objectives:
   - Would be good to implement a bit of parity checking
   - Package this as a libary for ready use in anything.
   - Write an android program that can visually decode such signals.
   - Or maybe a hardware with colour sensor that can decode such signals.
 
-Application:
+## Application:
   - Honestly there is not too much use for something like this, considering
   that there are already bluetooth.
   - As a slower alternative to UART... really?
   - Debug output? You might not have a UART engine in your mcu, but may have
     at least 3 pins to spare.
 
+
+## Table
 
 This is this table showing the LED colours and the meaning assigned to each state in this algo
 
