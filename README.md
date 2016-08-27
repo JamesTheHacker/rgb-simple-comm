@@ -52,14 +52,13 @@ Application:
 
 This is this table showing the LED colours and the meaning assigned to each state in this algo
 
-
-  | COLOUR   | R | G | B | Description                                                                |
-  |----------|---|---|---|----------------------------------------------------------------------------|
-  | DARK     | 0 | 0 | 0 | - Channel Off                                                              |
-  | BLUE     | 0 | 0 | 1 | 2bit Data Colour State 0                                                   |
-  | GREEN    | 0 | 1 | 0 | 2bit Data Colour State 1                                                   |
-  | CYAN     | 0 | 1 | 1 | 2bit Data Colour State 2                                                   |
-  | RED      | 1 | 0 | 0 | 2bit Data Colour State 3                                                   |
-  | MAGENTA  | 1 | 0 | 1 | 2bit Data Colour State 4                                                   |
-  | YELLOW   | 1 | 1 | 0 | - Mark 2 (Mark stderr ?) (Mark&Parity Bit 0 ?) (bitmap mode: vsync ?)      |
-  | WHITE    | 1 | 1 | 1 | - Mark 1 (Mark stdout ?) (Mark&Parity Bit 1 ?) (bitmap mode: hsync ?)      |
+| COLOUR   | R | G | B | Description                                                                |
+|----------|---|---|---|----------------------------------------------------------------------------|
+| DARK     | 0 | 0 | 0 | - Channel Off                                                              |
+| BLUE     | 0 | 0 | 1 | 2bit Data Colour State 0                                                   |
+| GREEN    | 0 | 1 | 0 | 2bit Data Colour State 1                                                   |
+| CYAN     | 0 | 1 | 1 | 2bit Data Colour State 2                                                   |
+| RED      | 1 | 0 | 0 | 2bit Data Colour State 3                                                   |
+| MAGENTA  | 1 | 0 | 1 | 2bit Data Colour State 4                                                   |
+| YELLOW   | 1 | 1 | 0 | - Mark 2 (Mark stderr ?) (Mark&Parity Bit 0 ?) (bitmap mode: vsync ?)      |
+| WHITE    | 1 | 1 | 1 | - Mark 1 (Mark stdout ?) (Mark&Parity Bit 1 ?) (bitmap mode: hsync ?)      |
