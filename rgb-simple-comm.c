@@ -62,8 +62,8 @@
     | CYAN     | 0 | 1 | 1 | 2bit Data Colour State 2                                                   |
     | RED      | 1 | 0 | 0 | 2bit Data Colour State 3                                                   |
     | MAGENTA  | 1 | 0 | 1 | 2bit Data Colour State 4                                                   |
-    | YELLOW   | 1 | 1 | 0 | - Mark 2 (Mark stderr ?) (Mark&Parity Bit 0 ?) (bitmap mode: vsync ?)      |
-    | WHITE    | 1 | 1 | 1 | - Mark 1 (Mark stdout ?) (Mark&Parity Bit 1 ?) (bitmap mode: hsync ?)      |
+    | YELLOW   | 1 | 1 | 0 | - Mark 2 (Mark stderr ?) (Mark&Parity Value 1 ?) (bitmap mode: vsync ?)      |
+    | WHITE    | 1 | 1 | 1 | - Mark 1 (Mark stdout ?) (Mark&Parity Value 0 ?) (bitmap mode: hsync ?)      |
   ```
 
 */
@@ -78,6 +78,9 @@
 #define CLRBIT( VARIABLE, BITPOS )                   VARIABLE   &= ~(1u<<BITPOS)
 #define TOGBIT( VARIABLE, BITPOS )                   VARIABLE   ^=  (1u<<BITPOS)
 
+#define PARITY_SETTING ODD_PARITY
+
+
 
 
 typedef enum rgb_colour {
@@ -90,6 +93,41 @@ typedef enum rgb_colour {
   YELLOW = 6,
   WHITE = 7
 } rgb_colour_t;
+
+
+/*
+  PARITY
+*/
+typedef enum paritySel {
+  NO_PARITY,
+  EVEN_PARITY,
+  ODD_PARITY
+} paritySel_t;
+
+uint8_t calcParity_u8bit (uint8_t data, paritySel_t paritySelect ) {
+  uint8_t parity = 0;
+  // Parity Calc
+  while (data) {
+    parity ^= (data & 0x01);
+    data = data >> 1;
+  }
+  switch (paritySelect) {
+  case (EVEN_PARITY): // Even number of `1` means parity bit of 0 ; Odd number of `1` means parity bit of 1 ;
+    return parity & 0x01;
+  case (ODD_PARITY): //  Even number of `1` means parity bit of 1 ; Odd number of `1` means parity bit of 0 ;
+    return (~parity) & 0x01;
+  case (NO_PARITY):
+    return 0x01;
+  }
+  return 0; // Should not be reached
+}
+
+uint8_t validParity_u8bit (uint8_t data, uint8_t parity_bit, paritySel_t paritySelect ) {
+  uint8_t parity = calcParity_u8bit(data, paritySelect);
+  return (parity & 0x01) == (parity_bit & 0x01);
+}
+
+
 
 /*
   ENCODE
@@ -144,15 +182,16 @@ rgb_colour_t nextColourSeq_from_2bit (uint8_t halfnibble, rgb_colour_t previous_
 }
 
 
-void toColourSeq_uint8 (const uint8_t input, rgb_colour_t colourSeq[100], int *seq_ptr) {
+void toColourSeq_uint8 (const uint8_t data, rgb_colour_t colourSeq[100], int *seq_ptr) {
   int j = *seq_ptr;
   rgb_colour_t previous_colour;
 
   previous_colour = (j == 0) ? DARK : colourSeq[j - 1];
 
+
   // Data
   for (int i = 0 ; i < 4; i++) { // 4 data seq + 1 mark seq
-    int half_nibble = (input >> 2 * (3 - i)) & 0x3; // next 2 bits
+    uint8_t half_nibble = (data >> 2 * (3 - i)) & 0x3; // next 2 bits
 
     colourSeq[j] = nextColourSeq_from_2bit(half_nibble, previous_colour);
 
@@ -160,8 +199,13 @@ void toColourSeq_uint8 (const uint8_t input, rgb_colour_t colourSeq[100], int *s
     j++;
   }
 
-  // Mark
-  colourSeq[j] = WHITE; // Indicate End of Word
+  // Mark End of Word (And also include parity bit)
+  if ( (calcParity_u8bit(data, PARITY_SETTING ) == 0 ) || PARITY_SETTING == NO_PARITY ) { //1
+    colourSeq[j] = WHITE; // parity = 0
+  } else {
+    colourSeq[j] = YELLOW; // parity = 1
+  }
+
   j++;
 
   // Return Values
@@ -269,6 +313,12 @@ int fromColourSeq_get_uint8 (const rgb_colour_t colourSeq[100], int *seq_ptr, ui
 
   previous_colour = ((*seq_ptr) == 0) ? DARK : colourSeq[ (*seq_ptr) - 1];
 
+  // Communication Line is Closed
+  rgb_colour_t seqPeek = colourSeq[(*seq_ptr)];
+  if ( seqPeek == DARK ){
+    return -1;
+  }
+
   // Extract next 8bit from stream
   *output = 0x00;
   for (int i = 0 ; i < 5 ; i++) {
@@ -282,10 +332,10 @@ int fromColourSeq_get_uint8 (const rgb_colour_t colourSeq[100], int *seq_ptr, ui
 
     switch (return_code) {
     case (2): // Mark 2
-      return 1; // Sucessfully Received a Byte (no parity checking at the moment)
+      return 2; // Yellow: Sucessfully Received a Byte (Parity bit = 1)
       break;
     case (1): // Mark 1
-      return 1; // Sucessfully Received a Byte (no parity checking at the moment)
+      return 1; // White: Sucessfully Received a Byte (Parity bit = 0)
       break;
     case (0): // Shift in half a nibble
       *output = *output << 2; // Shift by half nibble
@@ -407,9 +457,10 @@ int main( void )
   toColourSeq_uint8(displayBinary_uint8_t(' '), colourSeq, &j);
   toColourSeq_uint8(displayBinary_uint8_t(' '), colourSeq, &j);
   toColourSeq_uint8(displayBinary_uint8_t(' '), colourSeq, &j);
+  toColourSeq_uint8(displayBinary_uint8_t(' '), colourSeq, &j);
   printf("\n\n# Encoded Colour Seqence Output\n");
   for (int i; i < 100 ; i++) {
-    printf("%s ", rgb_colour_str[colourSeq[i]] );
+    printf("%d:%s ", i, rgb_colour_str[colourSeq[i]] );
   }
   printf("\n\n# Encoded Colour Seqence Output (Compact)\n");
   for (int i; i < 100 ; i++) {
@@ -430,15 +481,34 @@ int main( void )
 
   //printf("%2d k=%2d 0x%.2X '%c' \n", fromColourSeq_get_uint8(colourSeq, &k, &output_byte ), k, output_byte, output_byte );
 
-  for (int i; i < 20 ; i++) {
-    if (fromColourSeq_get_uint8(colourSeq, &k, &output_byte )) {
+  for (int i; i < 40 ; i++) {
+    int returncode = fromColourSeq_get_uint8(colourSeq, &k, &output_byte );
+    if (returncode >=0) {
       printf("%c", output_byte);
+      // Received Parity
+      uint8_t parity_bit;
+      switch (returncode) {
+      case (1): // White parity=0
+        parity_bit = 0x00;
+        break;
+      case (2): // Yellow parity=1
+        parity_bit = 0x01;
+        break;
+      }
+      // Mark End of Word (And also include parity bit)
+      if ( !validParity_u8bit(output_byte, parity_bit, PARITY_SETTING) ) {
+        //printf("! %d %d %d", output_byte, parity_bit, k);
+        printf("! ");
+      }
+      //printf("\n %d %d %d \n", output_byte, parity, parity_bit);
     } else {
       printf(" [END OF TRANSMISSION] ");
+      fflush(stdout);
       break;
     }
+    //  printf("X:%d",i);
   }
 
-  printf("\n");
+  printf("\n\n# Completed\n");
   return 0;
 }
