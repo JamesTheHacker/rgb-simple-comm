@@ -2,7 +2,8 @@
 * Author: Brian Khuu
 * Website: briankhuu.com
 * Date: 28th August 2016
-* Description:
+
+## Description:
   - The concept is to transmit data via LED in the simplest method possible.
   - The targets situation is a smartphone pointed at an LED.
 
@@ -36,13 +37,13 @@
   (But in the example, it is useds as a character mark and optionally as a
   parity bit)
 
-* Optional Objectives:
+##  Optional Objectives:
   - Would be good to implement a bit of parity checking
   - Package this as a libary for ready use in anything.
   - Write an android program that can visually decode such signals.
   - Or maybe a hardware with colour sensor that can decode such signals.
 
-Application:
+## Application:
   - Honestly there is not too much use for something like this, considering
   that there are already bluetooth.
   - As a slower alternative to UART... really?
@@ -50,16 +51,17 @@ Application:
     at least 3 pins to spare.
 
 
+## Table
+
 This is this table showing the LED colours and the meaning assigned to each state in this algo
 
-
-  | COLOUR   | R | G | B | Description                                                                |
-  |----------|---|---|---|----------------------------------------------------------------------------|
-  | DARK     | 0 | 0 | 0 | - Channel Off                                                              |
-  | BLUE     | 0 | 0 | 1 | 2bit Data Colour State 0                                                   |
-  | GREEN    | 0 | 1 | 0 | 2bit Data Colour State 1                                                   |
-  | CYAN     | 0 | 1 | 1 | 2bit Data Colour State 2                                                   |
-  | RED      | 1 | 0 | 0 | 2bit Data Colour State 3                                                   |
-  | MAGENTA  | 1 | 0 | 1 | 2bit Data Colour State 4                                                   |
-  | YELLOW   | 1 | 1 | 0 | - Mark 2 (Mark stderr ?) (Mark&Parity Bit 0 ?) (bitmap mode: vsync ?)      |
-  | WHITE    | 1 | 1 | 1 | - Mark 1 (Mark stdout ?) (Mark&Parity Bit 1 ?) (bitmap mode: hsync ?)      |
+| COLOUR   | R | G | B | Description                                                                |
+|----------|---|---|---|----------------------------------------------------------------------------|
+| DARK     | 0 | 0 | 0 | - Channel Off                                                              |
+| BLUE     | 0 | 0 | 1 | 2bit Data Colour State 0                                                   |
+| GREEN    | 0 | 1 | 0 | 2bit Data Colour State 1                                                   |
+| CYAN     | 0 | 1 | 1 | 2bit Data Colour State 2                                                   |
+| RED      | 1 | 0 | 0 | 2bit Data Colour State 3                                                   |
+| MAGENTA  | 1 | 0 | 1 | 2bit Data Colour State 4                                                   |
+| YELLOW   | 1 | 1 | 0 | - Mark 2 (Mark stderr ?) (Mark&Parity Bit 0 ?) (bitmap mode: vsync ?)      |
+| WHITE    | 1 | 1 | 1 | - Mark 1 (Mark stdout ?) (Mark&Parity Bit 1 ?) (bitmap mode: hsync ?)      |
